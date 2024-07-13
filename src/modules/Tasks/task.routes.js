@@ -19,7 +19,7 @@ router.put(
   "/:taskId",
   auth(),
  // validationMiddleware(validators.updatetaskSchema),
-  expressAsyncHandler(taskController.updatetask)
+  expressAsyncHandler(taskController.updateTask)
 );
 
 export default router;

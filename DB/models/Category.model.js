@@ -10,6 +10,7 @@ const categorySchema = new mongoose.Schema(
       maxlength: [20, "name is too long"],
       trim: true,
     },
+  
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

@@ -1,6 +1,8 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../../../DB/models/User.model.js";
+import Category from "../../../DB/models/Category.model.js";
+import Task from "../../../DB/models/Task.model.js";
 
 //============================= Sign In =============================//
 /**
@@ -13,13 +15,13 @@ import User from "../../../DB/models/User.model.js";
  */
 export const signUp = async (req, res, next) => {
   // * destructuring the data from the request body
-  const {name, email, password } = req.body;
+  const { name, email, password } = req.body;
 
   // * check if email already exist
-  const isEmailExist = await User.findOne({ email }); 
+  const isEmailExist = await User.findOne({ email });
   if (isEmailExist) {
     return next(
-      new Error('Email already exists', {
+      new Error("Email already exists", {
         cause: 409,
       })
     );
@@ -62,15 +64,13 @@ export const login = async (req, res, next) => {
   // * check if email already exists
   const user = await User.findOne({ email });
   if (!user) {
-    return next(new Error('Invalid login credentials', { cause: 404 }));
+    return next(new Error("Invalid login credentials", { cause: 404 }));
   }
 
   // * check if password matched
   const passwordMatched = bcrypt.compareSync(password, user.password);
   if (!passwordMatched) {
-    return next(
-      new Error('Password mismatch', { cause: 404 })
-    );
+    return next(new Error("Password mismatch", { cause: 404 }));
   }
 
   // * generate token for user
@@ -86,8 +86,6 @@ export const login = async (req, res, next) => {
   res.status(200).json({ message: "logged in successfully", data: { token } });
 };
 
-
-
 //============================= delete user =============================//
 /**
  * * destructure the user data from request headers
@@ -95,29 +93,38 @@ export const login = async (req, res, next) => {
  * * response successfully
  */
 export const deleteUser = async (req, res, next) => {
-    // * destructure the user data from request headers
-    const { _id } = req.authUser;
-  
-    // * find the user and delete them from the database
-    const user = await User.findByIdAndDelete(_id);
-    if (!user) {
-      return next(new Error("User not found", { cause: 404 }));
+  // * destructure the user data from request headers
+  const { _id } = req.authUser;
+
+  // * find the user and delete them from the database
+  const user = await User.findByIdAndDelete(_id);
+  if (!user) {
+    return next(new Error("User not found", { cause: 404 }));
+  }
+
+  // * delete Categories
+  const categoriesLen = await Category.find({createdBy: _id })
+  if (categoriesLen.length) {
+    const categories = await Category.deleteMany({ createdBy: _id });
+    if (!categories.deletedCount) {
+      return next(
+        new Error(" failed deleted categories this user", { cause: 400 })
+      );
     }
-  
-    // * delete subCategories and Brands
-    // const categories = await Category.find({ addedBy: _id });
-    // for (const category of categories) {
-    //   await SubCategories.deleteMany({ categoryId: category._id });
-    //   await Brand.deleteMany({ categoryId: category._id });
-    // }
-  
-    // * delete the category's user deleted
-    // const deleteCategory = await Category.deleteMany({ addedBy: _id });
-    // if (!deleteCategory) {
-    //   return next(new Error("Category not deleted", { cause: 409 }));
-    // }
-    // * response successfully
-    res
-      .status(200)
-      .json({ success: true, message: "Successfully deleted" });
-  };
+  }
+
+  // * delete tasks
+  const tasksLen = await Task.find({createdBy: _id })
+  if (tasksLen.length) {
+    const tasks = await Task.deleteMany({ createdBy: _id });
+    if (!tasks.deletedCount) {
+      return next(
+        new Error(" failed deleted tasks this user", { cause: 400 })
+      );
+    }
+  }
+
+  // * response successfully
+  res.status(200).json({ success: true, message: "Successfully deleted" });
+};
+
