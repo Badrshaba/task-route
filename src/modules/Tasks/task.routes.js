@@ -8,7 +8,7 @@ import { auth } from "../../middlewares/auth.middleware.js";
 
 const router = Router();
 
-router.post(
+router.post( 
   "/",
    auth(),
   // validationMiddleware(validators.addtaskSchema),
@@ -21,5 +21,25 @@ router.put(
  // validationMiddleware(validators.updatetaskSchema),
   expressAsyncHandler(taskController.updateTask)
 );
+router.get(
+  "/",
+  auth(),
+ // validationMiddleware(validators.updatetaskSchema),
+  expressAsyncHandler(taskController.getAllTasks)
+);
+router.get(
+  "/:taskId",
+  auth(),
+ // validationMiddleware(validators.updatetaskSchema),
+  expressAsyncHandler(taskController.getTask)
+);
+router.delete(
+  "/:taskId",
+  auth(),
+ // validationMiddleware(validators.updatetaskSchema),
+  expressAsyncHandler(taskController.deleteTask)
+);
+
+
 
 export default router;

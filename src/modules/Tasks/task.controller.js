@@ -11,7 +11,7 @@ import Task from "../../../DB/models/Task.model.js";
  * * response successfully created
  */
 export const addTask = async (req, res, next) => {
-  // * destructuring the data from the request body and authUser
+  // * destructuring the data from the request body and authUser 
   const { title, status } = req.body;
   const { _id } = req.authUser;
   const { categoryId } = req.query;
@@ -69,3 +69,32 @@ export const updateTask = async (req, res, next) => {
   // * success response
   res.status(200).json({ success: true, message: "Successfully updated" });
 };
+
+
+// delete task 
+
+export const getAllTasks = async (req,res,next) =>{ // هنا في مشكله 
+  const { _id } = req.authUser;
+  const tasks = await Task.find({$or:[{createdBy:_id,status:"Private"},{status:"Public"}]})
+    // * success response
+    res.status(200).json({ success: true, message: "Successfully" , data:tasks });
+}
+
+export const getTask = async (req,res,next) =>{
+  const { _id } = req.authUser;
+  const {taskId} = req.params
+  const task = await Task.findOne({_id:taskId,createdBy:_id})
+  res.status(200).json({ success: true, message: "Successfully" , data:task });
+
+}
+
+export const deleteTask = async (req,res,next) =>{
+  const { _id } = req.authUser;
+  const {taskId} = req.params
+const task = await Task.deleteOne({_id:taskId,createdBy:_id})
+if (!task.deletedCount) {
+  if (!task) return next(new Error(`Task not deleted`, { cause: 404 }));
+}
+res.status(200).json({ success: true, message: "Successfully deleted" });
+
+}

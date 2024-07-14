@@ -22,7 +22,6 @@ router.post(
 router.delete(
   "/",
    auth(),
-//   validationMiddleware(validators.deleteUserSchema),
   expressAsyncHandler(userController.deleteUser)
 );
 

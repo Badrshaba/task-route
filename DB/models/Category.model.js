@@ -17,8 +17,18 @@ const categorySchema = new mongoose.Schema(
       required: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+   }
 );
+
+// virtual populate for subCategories model
+categorySchema.virtual('tasks', {
+  ref: 'Task',
+  localField: '_id',
+  foreignField: 'categoryId',
+})
 
 export default mongoose.models.Category ||
   mongoose.model("Category", categorySchema);

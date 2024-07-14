@@ -1,4 +1,5 @@
 import Category from "../../../DB/models/Category.model.js";
+import Task from "../../../DB/models/Task.model.js";
 
 //================================ add category ================================//
 /**
@@ -26,7 +27,7 @@ export const addCategory = async (req, res, next) => {
 
   // * create the category document
   const categoryDocument = await Category.create(category);
-  if(!categoryDocument){
+  if (!categoryDocument) {
     return next(new Error("category isn't created", { cause: 400 }));
   }
   // * response successfully created
@@ -46,7 +47,7 @@ export const addCategory = async (req, res, next) => {
  * * check if new name === old name
  * * check if new name not already existing
  * * update image and use same public id  and folder id
- * * set value for the updatedBy 
+ * * set value for the updatedBy
  * * save values
  * * success response
  */
@@ -59,7 +60,7 @@ export const updateCategory = async (req, res, next) => {
   const { _id } = req.authUser;
 
   // * check if category exists
-  const category = await Category.findOne({createdBy:_id,_id:categoryId});
+  const category = await Category.findOne({ createdBy: _id, _id: categoryId });
   if (!category) return next(new Error(`Category not found`, { cause: 404 }));
 
   // * check is user wants to update name category
@@ -87,7 +88,65 @@ export const updateCategory = async (req, res, next) => {
   await category.save();
 
   // * success response
-  res
-    .status(200)
-    .json({ success: true, message: "Successfully updated" });
+  res.status(200).json({ success: true, message: "Successfully updated" });
+};
+
+// delete category
+
+export const getAllCategories = async (req, res, next) => {
+
+  const categories = await Category.find();
+  if (!categories.length) {
+    return res.status(200).json({
+      success: true,
+      message: "Category is empty",
+    });
+  }
+
+  res.status(200).json({
+    success: true,
+    message: "Successfully Get all Categories",
+    date: categories,
+  });
+};
+
+export const getCategory = async (req, res, next) => {
+  const { categoryId } = req.params;
+  const category = await Category.findById(categoryId).populate(
+    [
+        {
+            path: 'tasks',
+        }
+    ]
+);
+  if (!category) {
+    return next(new Error(`Category not found`, { cause: 404 }));
+  }
+  res.status(200).json({
+    success: true,
+    message: "Successfully Get Category",
+    date: category,
+  });
+};
+
+export const deleteCategory = async (req, res, next) => {
+  const { categoryId } = req.params;
+  const category = await Category.findByIdAndDelete(categoryId);
+  if (!category) {
+    return next(new Error("category not found", { cause: 404 }));
+  }
+
+  // * delete tasks
+  const tasksLen = await Task.find({ categoryId });
+  if (tasksLen.length) {
+    const tasks = await Task.deleteMany({ categoryId });
+    if (!tasks.deletedCount) {
+      return next(
+        new Error("failed deleted tasks this category", { cause: 400 })
+      );
+    }
+  }
+
+  // * response successfully
+  res.status(200).json({ success: true, message: "Successfully deleted" });
 };

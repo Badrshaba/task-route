@@ -5,12 +5,11 @@ import validationMiddleware from "../../middlewares/validation.middleware.js";
 import * as validators from "./category.validation.js";
 import { auth } from "../../middlewares/auth.middleware.js";
 
-
 const router = Router();
 
 router.post(
   "/",
-   auth(),
+  auth(),
   // validationMiddleware(validators.addCategorySchema),
   expressAsyncHandler(categoryController.addCategory)
 );
@@ -18,8 +17,25 @@ router.post(
 router.put(
   "/:categoryId",
   auth(),
- // validationMiddleware(validators.updateCategorySchema),
+  // validationMiddleware(validators.updateCategorySchema),
   expressAsyncHandler(categoryController.updateCategory)
+);
+router.get(
+  "/",
+  // validationMiddleware(validators.updateCategorySchema),
+  expressAsyncHandler(categoryController.getAllCategories)
+);
+router.get(
+  "/:categoryId",
+  auth(),
+  // validationMiddleware(validators.updateCategorySchema),
+  expressAsyncHandler(categoryController.getCategory)
+);
+router.delete(
+  "/:categoryId",
+  auth(),
+  // validationMiddleware(validators.updateCategorySchema),
+  expressAsyncHandler(categoryController.deleteCategory)
 );
 
 export default router;
