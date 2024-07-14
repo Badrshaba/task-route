@@ -1,6 +1,6 @@
 import Category from "../../../DB/models/Category.model.js";
 import Task from "../../../DB/models/Task.model.js";
-
+import { APIFeature } from "../../utils/api-features.js";
 //================================ add category ================================//
 /**
  * * detructure the required data from request body and request headers
@@ -93,22 +93,23 @@ export const updateCategory = async (req, res, next) => {
 
 // delete category
 
-export const getAllCategories = async (req, res, next) => {
+// export const getAllCategories = async (req, res, next) => {
+//   // * destructuring data from query
+//   const { page, size, sort, ...search } = req.query;
+//   const categories = await Category.find();
+//   if (!categories.length) {
+//     return res.status(200).json({
+//       success: true,
+//       message: "Category is empty",
+//     });
+//   }
 
-  const categories = await Category.find();
-  if (!categories.length) {
-    return res.status(200).json({
-      success: true,
-      message: "Category is empty",
-    });
-  }
-
-  res.status(200).json({
-    success: true,
-    message: "Successfully Get all Categories",
-    date: categories,
-  });
-};
+//   res.status(200).json({
+//     success: true,
+//     message: "Successfully Get all Categories",
+//     date: categories,
+//   });
+// };
 
 export const getCategory = async (req, res, next) => {
   const { categoryId } = req.params;
@@ -149,4 +150,22 @@ export const deleteCategory = async (req, res, next) => {
 
   // * response successfully
   res.status(200).json({ success: true, message: "Successfully deleted" });
+};
+
+ export const getAllCategories = async (req, res, next) => {
+  // * destructuring data from query
+  const { page, size, sort, ...search } = req.query;
+
+  // * get all categories
+  const features = new APIFeature(req.query, Category.find())
+    .pagination({
+      page,
+      size,
+    })
+    .sort(sort);
+
+  const categories = await features.mongooseQuery;
+
+  // * success response
+  res.status(200).json({ success: true, data: categories });
 };

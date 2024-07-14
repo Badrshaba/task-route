@@ -1,5 +1,6 @@
 import Category from "../../../DB/models/Category.model.js";
 import Task from "../../../DB/models/Task.model.js";
+import { APIFeature } from "../../utils/api-features.js";
 
 //================================ add task ================================//
 
@@ -71,14 +72,14 @@ export const updateTask = async (req, res, next) => {
 };
 
 
-// delete task 
 
-export const getAllTasks = async (req,res,next) =>{ // هنا في مشكله 
-  const { _id } = req.authUser;
-  const tasks = await Task.find({$or:[{createdBy:_id,status:"Private"},{status:"Public"}]})
-    // * success response
-    res.status(200).json({ success: true, message: "Successfully" , data:tasks });
-}
+
+// export const getAllTasks = async (req,res,next) =>{ // هنا في مشكله 
+//   const { _id } = req.authUser;
+//   const tasks = await Task.find({$or:[{createdBy:_id,status:"Private"},{status:"Public"}]})
+//     // * success response
+//     res.status(200).json({ success: true, message: "Successfully" , data:tasks });
+// }
 
 export const getTask = async (req,res,next) =>{
   const { _id } = req.authUser;
@@ -98,3 +99,27 @@ if (!task.deletedCount) {
 res.status(200).json({ success: true, message: "Successfully deleted" });
 
 }
+
+//=========================== get all Tasks with pagination ==========================//
+/**
+ * * destructuring the request query
+ * * get all tasks
+ * * success response
+ */
+export const getAllTasks = async (req, res, next) => {
+  // * destructuring the request query
+  const { page, size, sort, ...search } = req.query;
+
+  // * get all tasks
+  const features = new APIFeature(req.query, Task.find({ status: "Public" }))
+    .pagination({
+      page,
+      size,
+    })
+    .sort(sort);
+
+  const tasks = await features.mongooseQuery;
+
+  // * success response
+  res.status(200).json({ tasks });
+};

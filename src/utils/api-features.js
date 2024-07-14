@@ -1,7 +1,7 @@
 import { paginationFunction } from "./pagination.js"
 
 
-export class APIFeatures {
+export class APIFeature {
     constructor(query, mongooseQuery) {
         this.query = query // we can remove this variable becaue we didn't use it
         this.mongooseQuery = mongooseQuery
