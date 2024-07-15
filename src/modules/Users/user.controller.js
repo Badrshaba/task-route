@@ -90,6 +90,7 @@ export const login = async (req, res, next) => {
 /**
  * * destructure the user data from request headers
  * * find the user and delete them from the database
+ * * delete caregories and tasks created by this user
  * * response successfully
  */
 export const deleteUser = async (req, res, next) => {

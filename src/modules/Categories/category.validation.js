@@ -3,16 +3,17 @@ import { generalRules } from "../../utils/general.validation.rule.js";
 
 export const addCategorySchema = {
   body: Joi.object({
-    name: Joi.string().trim().min(3).max(20),
+    name: Joi.string().min(3).max(20),
   }).required(),
-  headers: generalRules.headersRules,
 };
 
 export const updateCategorySchema = {
   body: Joi.object({
-    name: Joi.string().trim(),
-    oldPublicId: generalRules.dbId,
+    name: Joi.string().min(3).max(20),
   }),
   params: Joi.object({ categoryId: generalRules.dbId }),
-  headers: generalRules.headersRules,
 };
+export const getCategorySchema = {
+  params: Joi.object({ categoryId: generalRules.dbId }),
+};
+ 

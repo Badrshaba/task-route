@@ -11,14 +11,14 @@ const router = Router();
 router.post( 
   "/",
    auth(),
-  // validationMiddleware(validators.addtaskSchema),
+   validationMiddleware(validators.addTaskSchema),
   expressAsyncHandler(taskController.addTask)
 );
 
 router.put(
-  "/:taskId",
+  "/:taskId", 
   auth(),
- // validationMiddleware(validators.updatetaskSchema),
+  validationMiddleware(validators.updateTaskSchema), 
   expressAsyncHandler(taskController.updateTask)
 );
 router.get(
@@ -30,13 +30,13 @@ router.get(
 router.get(
   "/:taskId",
   auth(),
- // validationMiddleware(validators.updatetaskSchema),
+  validationMiddleware(validators.getTaskByIdSchema),
   expressAsyncHandler(taskController.getTask)
 );
 router.delete(
   "/:taskId",
   auth(),
- // validationMiddleware(validators.updatetaskSchema),
+  validationMiddleware(validators.deleteTaskSchema),
   expressAsyncHandler(taskController.deleteTask)
 );
 

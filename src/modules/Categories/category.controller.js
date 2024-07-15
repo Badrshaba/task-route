@@ -39,14 +39,11 @@ export const addCategory = async (req, res, next) => {
 
 //================================ update category ================================//
 /**
- * * destructure name and oldPublicId from the request body
+ * * destructure name from the request body
  * * destructure category id from the request params
  * * destructure _id from the request authUser
  * * check if category exists
  * * check is user wants to update name category
- * * check if new name === old name
- * * check if new name not already existing
- * * update image and use same public id  and folder id
  * * set value for the updatedBy
  * * save values
  * * success response
@@ -91,28 +88,20 @@ export const updateCategory = async (req, res, next) => {
   res.status(200).json({ success: true, message: "Successfully updated" });
 };
 
-// delete category
 
-// export const getAllCategories = async (req, res, next) => {
-//   // * destructuring data from query
-//   const { page, size, sort, ...search } = req.query;
-//   const categories = await Category.find();
-//   if (!categories.length) {
-//     return res.status(200).json({
-//       success: true,
-//       message: "Category is empty",
-//     });
-//   }
 
-//   res.status(200).json({
-//     success: true,
-//     message: "Successfully Get all Categories",
-//     date: categories,
-//   });
-// };
+//================================ get category ================================//
+/**
+ * * destructure category id from the request params
+ * * find category by id populate tasks
+ * * check is category found
+ * * success response
+ */
 
 export const getCategory = async (req, res, next) => {
+// destructure category id from the request params
   const { categoryId } = req.params;
+// find category by id populate tasks
   const category = await Category.findById(categoryId).populate(
     [
         {
@@ -120,9 +109,11 @@ export const getCategory = async (req, res, next) => {
         }
     ]
 );
+// check is category found
   if (!category) {
     return next(new Error(`Category not found`, { cause: 404 }));
   }
+ // success response
   res.status(200).json({
     success: true,
     message: "Successfully Get Category",
@@ -130,17 +121,30 @@ export const getCategory = async (req, res, next) => {
   });
 };
 
+//================================ delete category ================================//
+/**
+ * * destructure category id from the request params
+ * * delete category by id populate tasks
+ * * check is category deleted
+ * * delete tasks related for category
+ * * check is tasks deleted
+ * * success response
+ */
+
 export const deleteCategory = async (req, res, next) => {
+ // destructure category id from the request params
   const { categoryId } = req.params;
+ // check is category deleted
   const category = await Category.findByIdAndDelete(categoryId);
+ // check is category deleted
   if (!category) {
     return next(new Error("category not found", { cause: 404 }));
   }
-
-  // * delete tasks
+  //  delete tasks related for category
   const tasksLen = await Task.find({ categoryId });
   if (tasksLen.length) {
     const tasks = await Task.deleteMany({ categoryId });
+ // check is tasks deleted
     if (!tasks.deletedCount) {
       return next(
         new Error("failed deleted tasks this category", { cause: 400 })
@@ -152,6 +156,13 @@ export const deleteCategory = async (req, res, next) => {
   res.status(200).json({ success: true, message: "Successfully deleted" });
 };
 
+
+
+
+//================================ get all categories with panation and sort ================================//
+// * destructuring data from query
+// * get all categories
+ // * success response
  export const getAllCategories = async (req, res, next) => {
   // * destructuring data from query
   const { page, size, sort, ...search } = req.query;

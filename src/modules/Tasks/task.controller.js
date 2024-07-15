@@ -71,35 +71,48 @@ export const updateTask = async (req, res, next) => {
   res.status(200).json({ success: true, message: "Successfully updated" });
 };
 
+//================================ get task ================================//
 
-
-
-// export const getAllTasks = async (req,res,next) =>{ // هنا في مشكله 
-//   const { _id } = req.authUser;
-//   const tasks = await Task.find({$or:[{createdBy:_id,status:"Private"},{status:"Public"}]})
-//     // * success response
-//     res.status(200).json({ success: true, message: "Successfully" , data:tasks });
-// }
-
+/**
+ * * detructure taskId params
+ * * find task by taskId and createdBy
+ * * response successfully
+ */
 export const getTask = async (req,res,next) =>{
   const { _id } = req.authUser;
+// detructure taskId params
   const {taskId} = req.params
+ // find task by taskId and createdBy
   const task = await Task.findOne({_id:taskId,createdBy:_id})
+ // response successfully
   res.status(200).json({ success: true, message: "Successfully" , data:task });
 
 }
 
+//================================ delete task ================================//
+
+/** 
+ * * detructure taskId params
+ * * delete task by taskId 
+ * * check is task deleted
+ * * response successfully
+ */
+
 export const deleteTask = async (req,res,next) =>{
   const { _id } = req.authUser;
+ // detructure taskId params
   const {taskId} = req.params
+ // delete task by taskId 
 const task = await Task.deleteOne({_id:taskId,createdBy:_id})
+// check is task deleted
 if (!task.deletedCount) {
   if (!task) return next(new Error(`Task not deleted`, { cause: 404 }));
 }
+// response successfully
 res.status(200).json({ success: true, message: "Successfully deleted" });
 
 }
-
+ 
 //=========================== get all Tasks with pagination ==========================//
 /**
  * * destructuring the request query
@@ -122,4 +135,4 @@ export const getAllTasks = async (req, res, next) => {
 
   // * success response
   res.status(200).json({ tasks });
-};
+}; 

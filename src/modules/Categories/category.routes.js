@@ -10,31 +10,30 @@ const router = Router();
 router.post(
   "/",
   auth(),
-  // validationMiddleware(validators.addCategorySchema),
+   validationMiddleware(validators.addCategorySchema),
   expressAsyncHandler(categoryController.addCategory)
 );
 
 router.put(
   "/:categoryId",
   auth(),
-  // validationMiddleware(validators.updateCategorySchema),
+   validationMiddleware(validators.updateCategorySchema),
   expressAsyncHandler(categoryController.updateCategory)
 );
 router.get(
   "/",
-  // validationMiddleware(validators.updateCategorySchema),
   expressAsyncHandler(categoryController.getAllCategories)
-);
+); 
 router.get(
   "/:categoryId",
   auth(),
-  // validationMiddleware(validators.updateCategorySchema),
+   validationMiddleware(validators.getCategorySchema),
   expressAsyncHandler(categoryController.getCategory)
 );
 router.delete(
   "/:categoryId",
   auth(),
-  // validationMiddleware(validators.updateCategorySchema),
+  validationMiddleware(validators.getCategorySchema),
   expressAsyncHandler(categoryController.deleteCategory)
 );
 
